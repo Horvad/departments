@@ -6,7 +6,6 @@ import by.itAcademy.dao.support.api.IManger;
 
 import javax.persistence.EntityManager;
 import javax.persistence.criteria.*;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -31,7 +30,9 @@ public class DaoLocation implements IDaoLocation {
             }
             throw new RuntimeException("Error in base, method add, class DaoLocation");
         } finally {
-          em.close();
+            if(em!=null) {
+                em.close();
+            }
         }
     }
 
@@ -63,7 +64,7 @@ public class DaoLocation implements IDaoLocation {
 
     @Override
     public Location getById(Long id) {
-        List<Location> location = null;
+        List<Location> location;
         EntityManager em = null;
         try {
             em = manger.getEntityManager();
@@ -110,7 +111,7 @@ public class DaoLocation implements IDaoLocation {
         } catch (RuntimeException e){
             if(em!=null){
                 em.getTransaction().rollback();
-//                throw new RuntimeException("Error in base, method 'delete', class Location");
+                throw new RuntimeException("Error in base, method 'delete', class Location");
             }
         } finally {
             if(em!=null){
@@ -190,7 +191,7 @@ public class DaoLocation implements IDaoLocation {
             em = manger.getEntityManager();
             em.getTransaction().begin();
             CriteriaBuilder builder = em.getCriteriaBuilder();
-            CriteriaQuery query = builder.createQuery(Location.class);
+            CriteriaQuery<Location> query = builder.createQuery(Location.class);
             Root<Location> locationRoot = query.from(Location.class);
             query.select(locationRoot).where(builder.equal(locationRoot.get("name"),name));
             List<Location> location = em.createQuery(query).getResultList();
@@ -204,7 +205,9 @@ public class DaoLocation implements IDaoLocation {
             }
             throw new RuntimeException("Error in base, method 'exit from name', class Location");
         } finally {
-            em.close();
+            if(em!=null){
+                em.close();
+            }
         }
         return exit;
     }
